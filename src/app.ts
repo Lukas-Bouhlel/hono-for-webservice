@@ -3,7 +3,7 @@ import { notFound } from "@/middlewares/not-found";
 import books from "@/routes/books";
 import env from "../env";
 
-const app = new Hono();
+const app = new Hono({ strict: false });
 
 app.get("/", (c) => {
   console.log(env.PORT); // Autocomplete ftw!
