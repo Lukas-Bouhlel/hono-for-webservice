@@ -9,6 +9,7 @@ const envSchema = z.object({
   MONGO_DATABASE: z.string().min(1),
   MONGO_USER: z.string().min(1),
   MONGO_PWD: z.string().min(1),
+  API_DEFAUT_LIMIT: z.coerce.number().min(1).default(50),
 });
 // Validate `process.env` against our schema
 // and return the result

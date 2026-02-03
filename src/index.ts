@@ -1,11 +1,10 @@
 import { serve } from "@hono/node-server";
-import env from "../env";
-
-import app from "./app";
 import { DbConnect } from "@/db";
 
-await DbConnect();
+import env from "../env";
+import app from "./app";
 
+await DbConnect();
 
 serve({
   fetch: app.fetch,
