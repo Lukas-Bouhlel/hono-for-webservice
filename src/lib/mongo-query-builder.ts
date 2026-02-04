@@ -1,7 +1,7 @@
 import env from "../../env";
 
 const queryBuilder = {
-  buildFind({ query = {} } = {}) {
+  buildFind({ query = {} as any } = {}) {
     const {
       sort = false,
       limit = env.API_DEFAUT_LIMIT,
@@ -9,10 +9,6 @@ const queryBuilder = {
     } = query;
     const mongooseQuery = this.extractQuery(rest);
     const mongooseSort = this.extractSort(sort);
-    // TODO Pagination!
-    // {skip:10}, {limit:50}
-    // const mongooseLimit      = this.extractLimit(perPage)
-    // const mongooseSkip       = this.extractSkip(page,perPage)
 
     const findObjectParams = {
       filter: mongooseQuery,
@@ -25,18 +21,19 @@ const queryBuilder = {
     console.log(JSON.stringify(findObjectParams, null, 2));
     return findObjectParams;
   },
-  extractQuery(queryRest) {
+  extractQuery(queryRest: any) {
     return { ...queryRest };
   },
-  extractSort(sort) {
+  extractSort(sort: string | string[]) {
     const sortOptions: Record<string, number> = {};
     if (sort) {
-      if (sort.includes("-")) {
-        const cleanParam = sort.slice(1, sort.length); // remove - from param names
+      const sortStr = Array.isArray(sort) ? sort[0] : sort;
+      if (sortStr.includes("-")) {
+        const cleanParam = sortStr.slice(1);
         sortOptions[cleanParam] = -1;
       }
       else {
-        sortOptions[sort] = 1;
+        sortOptions[sortStr] = 1;
       }
     }
     return { sort: sortOptions };

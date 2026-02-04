@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
-import { Book } from "@/models/book";
+import { Book } from "@/models/books";
 
 const bookSchema = z.object({
   title: z.string().min(1, "Title is required"),

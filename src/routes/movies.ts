@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 import { loggerMiddleware } from "@/middlewares/logger";
-import { Movie } from "@/models/movie";
+import { Movie } from "@/models/movies";
 import { MovieService } from "@/services/movie.service";
 
 const movieSchema = z.object({

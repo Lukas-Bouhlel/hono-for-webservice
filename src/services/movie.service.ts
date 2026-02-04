@@ -1,5 +1,5 @@
 import type { SortOrder } from "mongoose";
-import { Movie } from "@/models/movie";
+import { Movie } from "@/models/movies";
 
 export const MovieService = {
   async getAllMovies(params: {
