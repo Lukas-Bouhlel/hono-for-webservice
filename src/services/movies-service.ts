@@ -7,11 +7,12 @@ export const movieService = {
   fetchAll: async (req): Promise<any> => {
     const {
       filter,
+      projection,
       options,
     } = queryBuilder.buildFind({ query: req.query() });
 
     const xCount = await Movie.countDocuments(filter);
-    const data: iMovie[] = await Movie.find(filter, null, options);
+    const data: iMovie[] = await Movie.find(filter, projection, options);
     return {
       data,
       xCount,

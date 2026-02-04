@@ -1,100 +1,99 @@
-import { Schema, model } from "mongoose";
-export type iMovie = {
-  plot: string
-  genres: Array<string>
-  runtime: number
-  rated: string
-  poster: string
-  title: string
-  fullplot: string
-  languages: Array<string>
-  directors: Array<string>
+import { model, Schema } from "mongoose";
+
+export interface iMovie {
+  plot: string;
+  genres: Array<string>;
+  runtime: number;
+  rated: string;
+  poster: string;
+  title: string;
+  fullplot: string;
+  languages: Array<string>;
+  directors: Array<string>;
   awards: {
-    wins: number
-    nominations: number
-    text: string
-  }
-  year: number
+    wins: number;
+    nominations: number;
+    text: string;
+  };
+  year: number;
   imdb: {
-    rating: number
-    votes: number
-    id: number
-  }
-  countries: Array<string>
-  type: string
+    rating: number;
+    votes: number;
+    id: number;
+  };
+  countries: Array<string>;
+  type: string;
 }
 
 // 2. Create a Schema corresponding to the document interface.
 const movieSchema = new Schema<iMovie>({
-  "plot": {
-    "type": "String"
+  plot: {
+    type: "String",
   },
-  "genres": {
-    "type": [
-      "String"
-    ]
+  genres: {
+    type: [
+      "String",
+    ],
   },
-  "runtime": {
-    "type": "Number"
+  runtime: {
+    type: "Number",
   },
-  "rated": {
-    "type": "String"
+  rated: {
+    type: "String",
   },
-  "poster": {
-    "type": "String"
+  poster: {
+    type: "String",
   },
-  "title": {
-    "type": "String"
+  title: {
+    type: "String",
   },
-  "fullplot": {
-    "type": "String"
+  fullplot: {
+    type: "String",
   },
-  "languages": {
-    "type": [
-      "String"
-    ]
+  languages: {
+    type: [
+      "String",
+    ],
   },
-  "directors": {
-    "type": [
-      "String"
-    ]
+  directors: {
+    type: [
+      "String",
+    ],
   },
-  "awards": {
-    "wins": {
-      "type": "Number"
+  awards: {
+    wins: {
+      type: "Number",
     },
-    "nominations": {
-      "type": "Number"
+    nominations: {
+      type: "Number",
     },
-    "text": {
-      "type": "String"
-    }
-  },
-  "year": {
-    "type": "Number"
-  },
-  "imdb": {
-    "rating": {
-      "type": "Number"
+    text: {
+      type: "String",
     },
-    "votes": {
-      "type": "Number"
+  },
+  year: {
+    type: "Number",
+  },
+  imdb: {
+    rating: {
+      type: "Number",
     },
-    "id": {
-      "type": "Number"
-    }
+    votes: {
+      type: "Number",
+    },
+    id: {
+      type: "Number",
+    },
   },
-  "countries": {
-    "type": [
-      "String"
-    ]
+  countries: {
+    type: [
+      "String",
+    ],
   },
-  "type": {
-    "type": "String"
-  }
+  type: {
+    type: "String",
+  },
 });
-
-
 
 // 3. Create a Model.
 const Movie = model<iMovie>("movies", movieSchema);
