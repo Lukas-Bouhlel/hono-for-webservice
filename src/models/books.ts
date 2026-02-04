@@ -28,5 +28,6 @@ bookSchema.post<IBook>("save", async (doc) => {
 
 // 3. Create a Model.
 const Book = model<IBook>("books", bookSchema);
+console.log(Object.keys(Book.schema.obj));
 
 export { Book };
