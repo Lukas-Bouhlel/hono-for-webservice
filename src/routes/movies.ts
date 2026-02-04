@@ -21,6 +21,15 @@ api.get("/:id", isValidObjectIdMiddleware, async (c) => {
   return c.json(oneMovie);
 });
 
+api.get("/:id/comments", isValidObjectIdMiddleware, async (c) => {
+  // TODO: fetch comments for a movie
+  const oneMovie = await movieService.fetchById(c.req);
+  if (!oneMovie) {
+    return c.json({ message: "Movie not found" }, NOT_FOUND);
+  }
+  return c.json(oneMovie);
+});
+
 api.post("/", async (c) => {
 
   // const body = await c.req.json<IMovie>();
