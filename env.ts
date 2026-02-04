@@ -5,7 +5,6 @@ import { z } from "zod";
 
 const envSchema = z.object({
   PORT: z.coerce.number().min(1000).default(3000),
-  SUPABASE_URL: z.string().url(),
 });
 
 // Validate `process.env` against our schema
