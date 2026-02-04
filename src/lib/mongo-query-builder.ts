@@ -6,6 +6,7 @@ const queryBuilder = {
       sort = false,
       limit = env.API_DEFAUT_LIMIT,
       fields,
+      embed,
       page = 1,
       ...rest
     } = query;
@@ -16,11 +17,15 @@ const queryBuilder = {
     const mongooseLimit = this.extractLimit(limit);
     const mongooseSkip = this.extractSkip(page, limit);
     const mongooseProjection = this.extractSimpleProjection(fields);
+
+    const mongooseEmbed = this.extractEmbed(embed);
+
     const findObjectParams = {
       filter: mongooseQuery,
       projection: mongooseProjection,
       options: {
         ...mongooseSort,
+        ...mongooseEmbed,
         limit: mongooseLimit.limit,
         skip: mongooseSkip?.skip,
       },
@@ -66,6 +71,13 @@ const queryBuilder = {
       });
     }
     return projOptions;
+  },
+  extractEmbed(embed: string | undefined) {
+    const embedOptions: Record<string, string> = {};
+    if (embed) {
+      embedOptions.populate = { path: embed };
+    }
+    return embedOptions;
   },
 };
 

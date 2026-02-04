@@ -97,4 +97,5 @@ const movieSchema = new Schema<iMovie>({
 
 // 3. Create a Model.
 const Movie = model<iMovie>("movies", movieSchema);
+
 export { Movie };
