@@ -1,56 +1,103 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
-import { Movie } from "@/models/movies";
-import { movieService } from "@/services/movies-service";
-import { NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
+import { z } from "zod";
+import { loggerMiddleware } from "@/middlewares/logger";
+import { Movie } from "@/models/movie";
+import { MovieService } from "@/services/movie.service";
 
-const api = new Hono();
-
-api.get("/", async (c) => {
-  const allMovies = await movieService.fetchAll(c.req);
-  c.res.headers.set("X-Count", `${allMovies.xCount}`);
-  return c.json(allMovies.data);
+const movieSchema = z.object({
+  limit: z.coerce.number().min(1).max(100).default(50),
+  page: z.coerce.number().default(1).transform(val => Math.max(1, val)),
+  sort: z.enum(["asc", "desc"]).default("desc"),
+  sortField: z.string().default("year"),
+  genre: z.string().optional(),
+  year: z.coerce.number().optional(),
 });
 
-api.get("/:id", isValidObjectIdMiddleware, async (c) => {
-  const oneMovie = await movieService.fetchById(c.req);
-  if (!oneMovie) {
-    return c.json({ message: "Movie not found" }, NOT_FOUND);
+const api = new Hono().basePath("/movies");
+
+api.use("*", loggerMiddleware);
+
+api.get("/", zValidator("query", movieSchema), async (c) => {
+  try {
+    const query = c.req.valid("query");
+
+    const { movies, total } = await MovieService.getAllMovies(query);
+
+    return c.json({
+      data: movies,
+      meta: {
+        total,
+        limit: query.limit,
+        totalPages: Math.ceil(total / query.limit),
+        hasMore: query.page * query.limit < total,
+      },
+    });
   }
-  return c.json(oneMovie);
-});
-
-api.post("/", async () => {
-
-  // const body = await c.req.json<IMovie>();
-  // const newMovie = new Movie(body);
-  // try {
-  //    const tryToCreate = await newMovie.save();
-  //    return c.json(tryToCreate, CREATED);
-  // } catch (error) {
-  //   throw error
-  // }
-});
-
-api.patch("/:id", isValidObjectIdMiddleware, async () => {
-  // const { id } = c.req.param();
-  //  const updatedData = await c.req.json<IBook>();
-  // const tryToUpdate =  await Book.findByIdAndUpdate(id,updatedData,{ new: true });
-  // c
-  // if(!tryToUpdate){
-  //   return c.json({message: "Book not found"}, NOT_FOUND);
-  // }
-  // return c.json(tryToUpdate, PARTIAL_CONTENT);
-});
-
-api.delete("/:id", isValidObjectIdMiddleware, async (c) => {
-  const { id } = c.req.param();
-  const tryToDelete = await Movie.findByIdAndDelete(id);
-
-  if (!tryToDelete) {
-    return c.json({ message: "Movie not found" }, NOT_FOUND);
+  catch (e) {
+    return c.json({ error: (e as Error).message }, 500);
   }
-  return c.status(NO_CONTENT);
+});
+
+// GET /api/movies/:id
+api.get("/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    const movie = await Movie.findById(id);
+    if (!movie) {
+      return c.json({ message: "Movie not found" }, 404);
+    }
+    return c.json(movie);
+  }
+  catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// POST /api/movies
+api.post("/", zValidator("json", movieSchema), async (c) => {
+  const body = c.req.valid("json");
+  try {
+    const newMovie = await Movie.create(body);
+    return c.json(newMovie, 201);
+  }
+  catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// PATCH /api/movies/:id
+api.patch("/:id", zValidator("json", movieSchema.partial()), async (c) => {
+  const id = c.req.param("id");
+  const body = c.req.valid("json");
+  try {
+    const updatedMovie = await Movie.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedMovie) {
+      return c.json({ message: "Movie not found" }, 404);
+    }
+    return c.json(updatedMovie);
+  }
+  catch (e) {
+    return c.json({ error: (e as Error).message }, 400);
+  }
+});
+
+// DELETE /api/movies/:id
+api.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    const deletedMovie = await Movie.findByIdAndDelete(id);
+    if (!deletedMovie) {
+      return c.json({ message: "Movie not found" }, 404);
+    }
+    return c.json({ message: "Movie deleted" });
+  }
+  catch (e) {
+    return c.json({ error: (e as Error).message }, 500);
+  }
 });
 
 export default api;

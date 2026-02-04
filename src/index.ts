@@ -3,7 +3,8 @@ import env from "../env";
 import app from "./app";
 import { DbConnect } from "./db";
 
-await DbConnect();
+// app.route("/api", books); // > donc /api/books
+DbConnect();
 
 serve({
   fetch: app.fetch,

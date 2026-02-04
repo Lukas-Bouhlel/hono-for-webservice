@@ -1,7 +1,7 @@
 import env from "../../env";
 
 const queryBuilder = {
-  buildFind({ query = {} as any } = {}) {
+  buildFind({ query = {} } = {}) {
     const {
       sort = false,
       limit = env.API_DEFAUT_LIMIT,
@@ -25,19 +25,18 @@ const queryBuilder = {
     console.log(JSON.stringify(findObjectParams, null, 2));
     return findObjectParams;
   },
-  extractQuery(queryRest: any) {
+  extractQuery(queryRest) {
     return { ...queryRest };
   },
-  extractSort(sort: string | string[]) {
+  extractSort(sort) {
     const sortOptions: Record<string, number> = {};
     if (sort) {
-      const sortStr = Array.isArray(sort) ? sort[0] : sort;
-      if (sortStr.includes("-")) {
-        const cleanParam = sortStr.slice(1, sortStr.length); // remove - from param names
+      if (sort.includes("-")) {
+        const cleanParam = sort.slice(1, sort.length); // remove - from param names
         sortOptions[cleanParam] = -1;
       }
       else {
-        sortOptions[sortStr] = 1;
+        sortOptions[sort] = 1;
       }
     }
     return { sort: sortOptions };
