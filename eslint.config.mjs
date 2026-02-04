@@ -6,7 +6,7 @@ export default antfu({
   formatters: true,
   stylistic: {
     indent: 2,
-    semi: true, 
+    semi: true,
     quotes: "double",
   },
   ignores: ["**/migrations/*"],
