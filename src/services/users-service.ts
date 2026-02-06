@@ -3,36 +3,48 @@ import { hasher } from "@/lib/hasher";
 import { queryBuilder } from "@/lib/mongo-query-builder";
 import { User } from "@/models/users";
 
+interface ServiceResponse<T> {
+  ok: boolean;
+  data?: T;
+  message?: string;
+}
+
+interface UserLogin {
+  email: string;
+  password: string;
+}
+
 export const userService = {
 
-  fetchByEmail: async (req): Promise<IUser> => {
+  fetchByEmail: async (req): Promise<IUser | null> => {
     const { email } = req.param();
     return await User.findOne({ email });
   },
-  createOne: async (req): Promise<IUser> => {
-    const body = await req.json<IUser>();
+  createOne: async (req): Promise<ServiceResponse<IUser>> => {
+    const body = await req.json();
     try {
       body.password = hasher.do(body.password);
       const newUser = new User(body);
       const tryToCreate = await newUser.save();
-      return { success: true, data: tryToCreate };
+      return { ok: true, data: tryToCreate };
     }
     catch (error) {
-      return { success: false, message: error.errorResponse.errmsg };
+      const message = error instanceof Error ? error.message : "Unknown error";
+      return { ok: false, message };
     }
   },
-  login: async (req): Promise<IUser> => {
-    const body = await req.json<{ email: string; password: string }>();
+  login: async (req): Promise<ServiceResponse<IUser>> => {
+    const body = await req.json() as UserLogin;
     const findUserByEmail = await User.findOne({ email: body.email });
     if (!findUserByEmail) {
-      return { success: false, message: "User not found" };
+      return { ok: false, message: "User not found" };
     }
     const isPasswordValid = await hasher.verify(body.password, findUserByEmail.password);
     console.log(isPasswordValid);
     if (!isPasswordValid) {
-      return { success: false, message: "auth failed" };
+      return { ok: false, message: "auth failed" };
     }
-    return { success: true, data: findUserByEmail };
+    return { ok: true, data: findUserByEmail };
   },
 
 };
