@@ -35,12 +35,12 @@ export const userService = {
   },
   login: async (req): Promise<ServiceResponse<IUser>> => {
     const body = await req.json() as UserLogin;
-    const findUserByEmail = await User.findOne({ email: body.email });
+    const findUserByEmail = await User.findOne({ email: body.email }, { password: 1, email: 1, lastname: 1, firstname: 1 }).lean();
     if (!findUserByEmail) {
       return { ok: false, message: "User not found" };
     }
     const isPasswordValid = await hasher.verify(body.password, findUserByEmail.password);
-    console.log(isPasswordValid);
+
     if (!isPasswordValid) {
       return { ok: false, message: "auth failed" };
     }

@@ -1,8 +1,10 @@
 import { sValidator } from "@hono/standard-validator";
 import { Hono } from "hono";
+import { sign } from "hono/jwt";
 import * as z from "zod";
 import { userService } from "@/services/users-service";
-import { CONFLICT, CREATED, UNAUTHORIZED } from "@/shared/constants/http-status-codes";
+import { BAD_REQUEST, CONFLICT, CREATED, UNAUTHORIZED } from "@/shared/constants/http-status-codes";
+import env from "../../env";
 
 const registerScheme = z.object({
   email: z.email(),
@@ -13,9 +15,9 @@ const api = new Hono();
 
 api.post("/register", sValidator("json", registerScheme, async (result, c) => {
   if (!result.success) {
-    return c.text("Invalid!", 400);
+    return c.json({ msg: "Invalid!" }, BAD_REQUEST);
   }
-  // Si ici je suis sûr que le body de la req est conforme au schéma, je peux le typer
+  // Si on arrive ici je suis sûr que le body de la req est conforme au schéma et je peux le typer
   const tryToCreate = await userService.createOne(c.req);
   if (!tryToCreate.ok) {
     return c.json(tryToCreate, CONFLICT);
@@ -24,11 +26,23 @@ api.post("/register", sValidator("json", registerScheme, async (result, c) => {
   return c.json(tryToCreate.data, CREATED);
 }));
 
+// TODO: validator là aussi
 api.post("/login", async (c) => {
   const loginResult = await userService.login(c.req);
   if (!loginResult.ok) {
     return c.json(loginResult, UNAUTHORIZED);
   }
-  return c.json(loginResult.data);
+  // TO EXTRACT
+  const { _id } = loginResult.data;
+  const payload = {
+    sub: _id,
+    exp: Math.floor(Date.now() / 1000) + 60 * 5, // Token expires in 5 minutes
+  };
+  const token = await sign(payload, env.JWT_SECRET);
+  console.log("Generated JWT:", token);
+  c.res.headers.set("Authorization", token);
+  const { password: _, ...userWithoutPassword } = loginResult.data;
+  return c.json(userWithoutPassword);
 });
+
 export default api;
