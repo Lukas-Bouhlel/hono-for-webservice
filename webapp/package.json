@@ -2,7 +2,7 @@
   "name": "hono-for-webservices",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --env-file=.env src/index.ts",
+    "dev": "tsx watch --env-file=../.env src/index.ts",
     "lint": "eslint .",
     "build": "tsc",
     "start": "node dist/index.js"

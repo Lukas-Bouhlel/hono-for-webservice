@@ -1,5 +1,5 @@
 import { connect } from "mongoose";
-import env from "../webapp/env";
+import env from "../../webapp/env";
 
 // or any ORM and connection string/method according to your database
 

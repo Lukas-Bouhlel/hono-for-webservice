@@ -1,7 +1,7 @@
 import { serve } from "@hono/node-server";
 import { DbConnect } from "@/db";
 
-import env from "../webapp/env";
+import env from "../env";
 import app from "./app";
 
 await DbConnect();

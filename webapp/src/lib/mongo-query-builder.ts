@@ -1,4 +1,4 @@
-import env from "../../webapp/env";
+import env from "../../env";
 
 const queryBuilder = {
   buildFind({ query = {} }: { query?: Record<string, any> } = {}) {
@@ -30,7 +30,7 @@ const queryBuilder = {
         skip: mongooseSkip?.skip,
       },
     };
-    console.log(JSON.stringify(findObjectParams, null, 2));
+    // console.log(JSON.stringify(findObjectParams, null, 2));
     return findObjectParams;
   },
   extractQuery(queryRest) {

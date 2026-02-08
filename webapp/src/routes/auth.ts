@@ -5,7 +5,7 @@ import { JwtTokenExpired } from "hono/utils/jwt/types";
 import * as z from "zod";
 import { userService } from "@/services/users-service";
 import { BAD_REQUEST, CONFLICT, CREATED, UNAUTHORIZED } from "@/shared/constants/http-status-codes";
-import env from "../../webapp/env";
+import env from "../../env";
 
 const registerScheme = z.object({
   email: z.email(),
