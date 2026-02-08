@@ -40,7 +40,6 @@ export const userService = {
       return { ok: false, message: "User not found" };
     }
     const isPasswordValid = await hasher.verify(body.password, findUserByEmail.password);
-
     if (!isPasswordValid) {
       return { ok: false, message: "auth failed" };
     }
