@@ -34,69 +34,47 @@ api.get("/", zValidator("query", movieSchema), async (c) => {
       },
     });
   }
-  catch (e) {
-    return c.json({ error: (e as Error).message }, 500);
-  }
+  return c.json(oneMovie);
 });
 
-// GET /api/movies/:id
-api.get("/:id", async (c) => {
-  const id = c.req.param("id");
-  try {
-    const movie = await Movie.findById(id);
-    if (!movie) {
-      return c.json({ message: "Movie not found" }, 404);
-    }
-    return c.json(movie);
+api.get("/:id/comments", isValidObjectIdMiddleware, async (c) => {
+  // TODO: fetch comments for a movie
+  const oneMovie = await movieService.fetchById(c.req);
+  if (!oneMovie) {
+    return c.json({ message: "Movie not found" }, NOT_FOUND);
   }
-  catch (e) {
-    return c.json({ error: (e as Error).message }, 400);
-  }
+  return c.json(oneMovie);
 });
 
-// POST /api/movies
-api.post("/", zValidator("json", movieSchema), async (c) => {
-  const body = c.req.valid("json");
-  try {
-    const newMovie = await Movie.create(body);
-    return c.json(newMovie, 201);
-  }
-  catch (e) {
-    return c.json({ error: (e as Error).message }, 400);
-  }
+api.post("/", async (c) => {
+
+  // const body = await c.req.json<IMovie>();
+  // const newMovie = new Movie(body);
+  // try {
+  //    const tryToCreate = await newMovie.save();
+  //    return c.json(tryToCreate, CREATED);
+  // } catch (error) {
+  //   throw error
+  // }
 });
 
-// PATCH /api/movies/:id
-api.patch("/:id", zValidator("json", movieSchema.partial()), async (c) => {
-  const id = c.req.param("id");
-  const body = c.req.valid("json");
-  try {
-    const updatedMovie = await Movie.findByIdAndUpdate(id, body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!updatedMovie) {
-      return c.json({ message: "Movie not found" }, 404);
-    }
-    return c.json(updatedMovie);
-  }
-  catch (e) {
-    return c.json({ error: (e as Error).message }, 400);
-  }
+api.patch("/:id", isValidObjectIdMiddleware, async (c) => {
+  // const { id } = c.req.param();
+  //  const updatedData = await c.req.json<IBook>();
+  // const tryToUpdate =  await Book.findByIdAndUpdate(id,updatedData,{ new: true });
+  // c
+  // if(!tryToUpdate){
+  //   return c.json({message: "Book not found"}, NOT_FOUND);
+  // }
+  // return c.json(tryToUpdate, PARTIAL_CONTENT);
 });
 
-// DELETE /api/movies/:id
-api.delete("/:id", async (c) => {
-  const id = c.req.param("id");
-  try {
-    const deletedMovie = await Movie.findByIdAndDelete(id);
-    if (!deletedMovie) {
-      return c.json({ message: "Movie not found" }, 404);
-    }
-    return c.json({ message: "Movie deleted" });
-  }
-  catch (e) {
-    return c.json({ error: (e as Error).message }, 500);
+api.delete("/:id", isValidObjectIdMiddleware, async (c) => {
+  const { id } = c.req.param();
+  const tryToDelete = await Movie.findByIdAndDelete(id);
+
+  if (!tryToDelete) {
+    return c.json({ message: "Movie not found" }, NOT_FOUND);
   }
 });
 

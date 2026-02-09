@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { notFound } from "@/middlewares/not-found";
+import auth from "@/routes/auth";
 import books from "@/routes/books";
+import comments from "@/routes/comments";
 import movies from "@/routes/movies";
 import sample from "@/routes/sample-fix";
 import env from "../env";
@@ -11,11 +13,10 @@ app.get("/", (c) => {
   console.log(env.PORT); // Autocomplete ftw!
   return c.text("Hello Hono 🔥");
 });
-
-app.route("/api", books); // > donc /api/books
-app.route("/api", sample);
-app.route("/api", movies);
-
+app.route("/books", books); // > donc v1/api/books
+app.route("/movies", movies); // > donc v1/api/movies
+app.route("/comments", comments); // > donc v1/api/comments
+app.route("/auth", auth); // > donc v1/api/auth
 app.notFound(notFound);
 
 export default app;
