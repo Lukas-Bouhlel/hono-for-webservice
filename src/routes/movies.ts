@@ -1,13 +1,14 @@
 import { Hono } from "hono";
 import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
 
+import { rbacGuard } from "@/middlewares/rbac-guard";
 import { Movie } from "@/models/movies";
 import { movieService } from "@/services/movies-service";
 import { NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
 
 const api = new Hono();
 
-api.get("/", async (c) => {
+api.get("/", rbacGuard, async (c) => {
   const allMovies = await movieService.fetchAll(c.req);
   c.res.headers.set("X-Count", `${allMovies.xCount}`);
   return c.json(allMovies.data);
