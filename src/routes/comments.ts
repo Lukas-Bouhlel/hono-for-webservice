@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
-
 import { commentService } from "@/services/comments-service";
 import { NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
+import { Movie } from "@/models/movies";
 
 const api = new Hono();
 

@@ -2,8 +2,10 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 import { loggerMiddleware } from "@/middlewares/logger";
+import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
 import { Movie } from "@/models/movies";
 import { MovieService } from "@/services/movie.service";
+import { NOT_FOUND } from "@/shared/constants/http-status-phrases";
 
 const movieSchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(50),
@@ -14,7 +16,7 @@ const movieSchema = z.object({
   year: z.coerce.number().optional(),
 });
 
-const api = new Hono().basePath("/movies");
+const api = new Hono();
 
 api.use("*", loggerMiddleware);
 
@@ -34,7 +36,9 @@ api.get("/", zValidator("query", movieSchema), async (c) => {
       },
     });
   }
-  return c.json(oneMovie);
+  catch (e) {
+    return c.json({ error: (e as Error).message }, 500);
+  }
 });
 
 api.get("/:id/comments", isValidObjectIdMiddleware, async (c) => {

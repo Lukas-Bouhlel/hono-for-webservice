@@ -9,7 +9,7 @@ const sampleFixSchema = z.object({
 });
 
 // Initialisation avec basePath
-const api = new Hono().basePath("/sample-fix");
+const api = new Hono();
 
 api.get("/", async (c) => {
   try {

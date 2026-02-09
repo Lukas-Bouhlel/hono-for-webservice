@@ -74,7 +74,7 @@ const queryBuilder = {
     return projOptions;
   },
   extractEmbed(embed: string | undefined) {
-    const embedOptions: Record<string, string> = {};
+    const embedOptions: Record<string, any> = {};
     if (embed) {
       embedOptions.populate = { path: embed };
     }
