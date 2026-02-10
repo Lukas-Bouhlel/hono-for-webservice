@@ -3,6 +3,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { loggerMiddleware } from "@/middlewares/logger";
 import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
+
+import { rbacGuard } from "@/middlewares/rbac-guard";
 import { Movie } from "@/models/movies";
 import { MovieService } from "@/services/movie.service";
 import { NOT_FOUND } from "@/shared/constants/http-status-phrases";
@@ -18,7 +20,11 @@ const movieSchema = z.object({
 
 const api = new Hono();
 
-api.use("*", loggerMiddleware);
+api.get("/", rbacGuard, async (c) => {
+  const allMovies = await movieService.fetchAll(c.req);
+  c.res.headers.set("X-Count", `${allMovies.xCount}`);
+  return c.json(allMovies.data);
+});
 
 api.get("/", zValidator("query", movieSchema), async (c) => {
   try {
