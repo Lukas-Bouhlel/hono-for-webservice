@@ -1,22 +1,9 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { z } from "zod";
-import { loggerMiddleware } from "@/middlewares/logger";
 import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
-
 import { rbacGuard } from "@/middlewares/rbac-guard";
 import { Movie } from "@/models/movies";
-import { MovieService } from "@/services/movie.service";
-import { NOT_FOUND } from "@/shared/constants/http-status-phrases";
-
-const movieSchema = z.object({
-  limit: z.coerce.number().min(1).max(100).default(50),
-  page: z.coerce.number().default(1).transform(val => Math.max(1, val)),
-  sort: z.enum(["asc", "desc"]).default("desc"),
-  sortField: z.string().default("year"),
-  genre: z.string().optional(),
-  year: z.coerce.number().optional(),
-});
+import { movieService } from "@/services/movie-service";
+import { NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
 
 const api = new Hono();
 
@@ -26,25 +13,12 @@ api.get("/", rbacGuard, async (c) => {
   return c.json(allMovies.data);
 });
 
-api.get("/", zValidator("query", movieSchema), async (c) => {
-  try {
-    const query = c.req.valid("query");
-
-    const { movies, total } = await MovieService.getAllMovies(query);
-
-    return c.json({
-      data: movies,
-      meta: {
-        total,
-        limit: query.limit,
-        totalPages: Math.ceil(total / query.limit),
-        hasMore: query.page * query.limit < total,
-      },
-    });
+api.get("/:id", isValidObjectIdMiddleware, async (c) => {
+  const oneMovie = await movieService.fetchById(c.req);
+  if (!oneMovie) {
+    return c.json({ message: "Movie not found" }, NOT_FOUND);
   }
-  catch (e) {
-    return c.json({ error: (e as Error).message }, 500);
-  }
+  return c.json(oneMovie);
 });
 
 api.get("/:id/comments", isValidObjectIdMiddleware, async (c) => {
@@ -86,6 +60,7 @@ api.delete("/:id", isValidObjectIdMiddleware, async (c) => {
   if (!tryToDelete) {
     return c.json({ message: "Movie not found" }, NOT_FOUND);
   }
+  return c.status(NO_CONTENT);
 });
 
 export default api;
