@@ -12,9 +12,7 @@ const envSchema = z.object({
   API_DEFAUT_LIMIT: z.coerce.number().min(1).default(50),
   JWT_SECRET: z.string().min(12),
 });
-// Validate `process.env` against our schema
-// and return the result
-// eslint-disable-next-line node/no-process-env
+
 const env = envSchema.parse(process.env);
 
 // Export the result so we can use it in the project

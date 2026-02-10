@@ -2,7 +2,7 @@
   "name": "hono-for-webservices",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --env-file=../.env src/index.ts",
+    "dev": "tsx watch --env-file=.env src/index.ts",
     "lint": "eslint .",
     "build": "tsc",
     "start": "node dist/index.js"
@@ -11,7 +11,7 @@
     "@hono/node-server": "^1.19.9",
     "@hono/standard-validator": "^0.2.2",
     "hono": "^4.11.7",
-    "mongoose": "^9.1.5",
+    "mongoose": "^9.2.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
