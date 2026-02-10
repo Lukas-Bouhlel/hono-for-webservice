@@ -43,6 +43,8 @@ api.post("/login", async (c) => {
   const token = await sign(payload, env.JWT_SECRET, "HS256");
 
   c.res.headers.set("Authorization", token);
+  // Dans api.post("/login", ...)
+c.res.headers.set("Authorization", `Bearer ${token}`);
   const { password: _, ...userWithoutPassword } = loginResult.data;
   return c.json(userWithoutPassword);
 });
